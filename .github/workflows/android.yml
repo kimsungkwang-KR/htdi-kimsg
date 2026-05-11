@@ -11,8 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout latest source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show current files
+        run: |
+          pwd
+          ls -la
+          echo "===== gradle.properties ====="
+          cat gradle.properties || true
+          echo "===== app/build.gradle ====="
+          cat app/build.gradle
+          echo "===== MainActivity.kt AndroidX check ====="
+          grep -R "androidx" app/src/main || true
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -26,7 +39,7 @@ jobs:
           gradle-version: 8.10.2
 
       - name: Build APK
-        run: gradle assembleDebug -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true
+        run: gradle --no-daemon clean :app:assembleDebug -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
