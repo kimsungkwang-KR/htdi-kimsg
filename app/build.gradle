@@ -14,11 +14,6 @@ android {
         versionCode 74
         versionName "v74"
     }
-
-    buildTypes {
-        debug {
-        }
-    }
 }
 
 dependencies {
