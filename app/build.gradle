@@ -1,4 +1,3 @@
-
 plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
@@ -8,10 +7,6 @@ android {
     namespace "kr.co.htdi.mes"
     compileSdk 35
 
-    buildFeatures {
-        buildConfig true
-    }
-
     defaultConfig {
         applicationId "kr.co.htdi.mes"
         minSdk 26
@@ -19,9 +14,12 @@ android {
         versionCode 74
         versionName "v74"
     }
+
+    buildTypes {
+        debug {
+        }
+    }
 }
 
 dependencies {
-    
-    
 }
