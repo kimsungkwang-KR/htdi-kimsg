@@ -11,12 +11,12 @@ import android.view.View
 import android.view.WindowManager
 import android.webkit.*
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
     private lateinit var root: FrameLayout
     private lateinit var webView: WebView
     private val prefs by lazy { getSharedPreferences("htdi_mes_prefs", Context.MODE_PRIVATE) }
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val subtitle = TextView(this).apply {
-            text = "서버 주소를 입력하세요"
+            text = "?�버 주소�??�력?�세??
             textSize = 24f
             setTextColor(Color.WHITE)
             gravity = Gravity.CENTER
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
         val input = EditText(this).apply {
             setText(if (serverUrl.isNotBlank()) serverUrl else "https://192.168.0.163:4443")
-            hint = "예: https://192.168.0.163:4443"
+            hint = "?? https://192.168.0.163:4443"
             textSize = 22f
             singleLine = true
             setTextColor(Color.WHITE)
@@ -107,8 +107,8 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, 16, 0, 0)
         }
 
-        val testBtn = Button(this).apply { text = "연결 테스트"; textSize = 20f }
-        val saveBtn = Button(this).apply { text = "저장 및 시작"; textSize = 20f }
+        val testBtn = Button(this).apply { text = "?�결 ?�스??; textSize = 20f }
+        val saveBtn = Button(this).apply { text = "?�??�??�작"; textSize = 20f }
 
         row.addView(testBtn, LinearLayout.LayoutParams(230, 72).apply { setMargins(10, 0, 10, 0) })
         row.addView(saveBtn, LinearLayout.LayoutParams(230, 72).apply { setMargins(10, 0, 10, 0) })
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
 
         testBtn.setOnClickListener {
             val url = normalizeUrl(input.text.toString())
-            status.text = "연결 확인 중..."
+            status.text = "?�결 ?�인 �?.."
             testConnection(url) { ok, msg ->
                 runOnUiThread {
                     status.setTextColor(if (ok) Color.rgb(34, 197, 94) else Color.rgb(248, 113, 113))
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
         title.setOnLongClickListener {
             serverUrl = ""
-            Toast.makeText(this, "서버 설정 초기화", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "?�버 ?�정 초기??, Toast.LENGTH_SHORT).show()
             true
         }
     }
@@ -153,9 +153,9 @@ class MainActivity : AppCompatActivity() {
                 conn.readTimeout = 4000
                 conn.requestMethod = "GET"
                 val code = conn.responseCode
-                callback(code in 200..399, "연결 결과: HTTP $code")
+                callback(code in 200..399, "?�결 결과: HTTP $code")
             } catch (e: Exception) {
-                callback(false, "연결 실패: ${e.message ?: "unknown"}")
+                callback(false, "?�결 ?�패: ${e.message ?: "unknown"}")
             }
         }
     }
@@ -181,15 +181,15 @@ class MainActivity : AppCompatActivity() {
                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean = false
 
                 override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
-                    // HTDI 사내 로컬 인증서 환경을 위해 허용.
-                    // 공인 인증서 도입 시 제거 권장.
+                    // HTDI ?�내 로컬 ?�증???�경???�해 ?�용.
+                    // 공인 ?�증???�입 ???�거 권장.
                     handler?.proceed()
                 }
 
                 override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                     super.onReceivedError(view, request, error)
                     if (request?.isForMainFrame == true) {
-                        showError(url, error?.description?.toString() ?: "페이지 로드 실패")
+                        showError(url, error?.description?.toString() ?: "?�이지 로드 ?�패")
                     }
                 }
             }
@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val title = TextView(this).apply {
-            text = "서버 연결 실패"
+            text = "?�버 ?�결 ?�패"
             textSize = 34f
             setTextColor(Color.rgb(248, 113, 113))
             gravity = Gravity.CENTER
@@ -226,13 +226,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         val retry = Button(this).apply {
-            text = "다시 연결"
+            text = "?�시 ?�결"
             textSize = 20f
             setOnClickListener { showWebView(serverUrl) }
         }
 
         val setting = Button(this).apply {
-            text = "서버 설정"
+            text = "?�버 ?�정"
             textSize = 20f
             setOnClickListener { showServerSetup() }
         }
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         if (::webView.isInitialized && webView.canGoBack()) {
             webView.goBack()
         } else {
-            Toast.makeText(this, "HTDI MES 실행 중입니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "HTDI MES ?�행 중입?�다.", Toast.LENGTH_SHORT).show()
         }
     }
 
