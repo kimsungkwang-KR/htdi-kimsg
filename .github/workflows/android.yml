@@ -33,13 +33,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.10.2
-
       - name: Build APK
-        run: gradle --no-daemon clean :app:assembleDebug -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true
+         run: gradle --no-daemon --no-build-cache clean :app:assembleDebug -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
