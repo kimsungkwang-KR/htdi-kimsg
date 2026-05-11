@@ -1,3 +1,6 @@
+System.setProperty("android.useAndroidX", "true")
+System.setProperty("android.enableJetifier", "true")
+
 plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
@@ -6,6 +9,10 @@ plugins {
 android {
     namespace "kr.co.htdi.mes"
     compileSdk 35
+
+    buildFeatures {
+        buildConfig true
+    }
 
     defaultConfig {
         applicationId "kr.co.htdi.mes"
