@@ -34,7 +34,7 @@ jobs:
           java-version: 17
 
       - name: Build APK
-        run: gradle --no-daemon --no-build-cache clean :app:assembleDebug -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true
+        run: gradle --no-daemon --no-build-cache clean :app:assembleDebug -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true -Dorg.gradle.java.home=$JAVA_HOME -Dkotlin.jvm.target.validation.mode=warning
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
