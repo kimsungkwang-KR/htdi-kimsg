@@ -18,6 +18,10 @@ import kotlin.concurrent.thread
 
 class MainActivity : Activity() {
 
+    companion object {
+        private const val DEFAULT_SERVER_URL = "https://192.168.0.50:443"
+    }
+
     private lateinit var root: FrameLayout
     private lateinit var webView: WebView
 
@@ -40,10 +44,24 @@ class MainActivity : Activity() {
         root = FrameLayout(this)
         setContentView(root)
 
+        migrateServerUrlIfNeeded()
+
         if (serverUrl.isBlank()) {
             showServerSetup()
         } else {
             showWebView(serverUrl)
+        }
+    }
+
+    private fun migrateServerUrlIfNeeded() {
+        val saved = serverUrl
+
+        if (
+            saved.isBlank() ||
+            saved.contains("192.168.0.163") ||
+            saved.contains("192.168.0.50:4443")
+        ) {
+            serverUrl = DEFAULT_SERVER_URL
         }
     }
 
@@ -91,7 +109,7 @@ class MainActivity : Activity() {
                 if (serverUrl.isNotBlank())
                     serverUrl
                 else
-                    "https://192.168.0.163:4443"
+                    DEFAULT_SERVER_URL
             )
 
             hint = "https://server-address"
