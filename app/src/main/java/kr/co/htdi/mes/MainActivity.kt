@@ -19,7 +19,7 @@ import kotlin.concurrent.thread
 class MainActivity : Activity() {
 
     companion object {
-        private const val DEFAULT_SERVER_URL = "https://192.168.0.50:4443"
+        private const val DEFAULT_SERVER_URL = "http://192.168.0.50:4443"
     }
 
     private lateinit var root: FrameLayout
@@ -59,7 +59,8 @@ class MainActivity : Activity() {
         if (
             saved.isBlank() ||
             saved.contains("192.168.0.163") ||
-            saved.contains("192.168.0.50:443")
+            saved.contains("192.168.0.50:443") ||
+            saved == "https://192.168.0.50:4443"
         ) {
             serverUrl = DEFAULT_SERVER_URL
         }
@@ -74,7 +75,7 @@ class MainActivity : Activity() {
         ) {
             value
         } else {
-            "https://$value"
+            "http://$value"
         }
     }
 
@@ -112,7 +113,7 @@ class MainActivity : Activity() {
                     DEFAULT_SERVER_URL
             )
 
-            hint = "https://server-address"
+            hint = "http://server-address"
             textSize = 20f
             setTextColor(Color.WHITE)
             setHintTextColor(Color.LTGRAY)
