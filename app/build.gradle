@@ -9,8 +9,8 @@ android {
         applicationId "kr.co.htdi.mes"
         minSdk 26
         targetSdk 35
-        versionCode 76
-        versionName "v76-exitbridge-443"
+        versionCode 77
+        versionName "v77-exitbridge-4443"
     }
 
     compileOptions {
