@@ -19,7 +19,7 @@ import kotlin.concurrent.thread
 class MainActivity : Activity() {
 
     companion object {
-        private const val DEFAULT_SERVER_URL = "https://192.168.0.50:443"
+        private const val DEFAULT_SERVER_URL = "https://192.168.0.50:4443"
     }
 
     private lateinit var root: FrameLayout
@@ -59,7 +59,7 @@ class MainActivity : Activity() {
         if (
             saved.isBlank() ||
             saved.contains("192.168.0.163") ||
-            saved.contains("192.168.0.50:4443")
+            saved.contains("192.168.0.50:443")
         ) {
             serverUrl = DEFAULT_SERVER_URL
         }
