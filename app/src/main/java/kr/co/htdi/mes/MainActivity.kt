@@ -5,10 +5,13 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.net.http.SslError
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.*
 import android.widget.*
@@ -44,6 +47,11 @@ class MainActivity : Activity() {
         root = FrameLayout(this)
         setContentView(root)
 
+        window.decorView.setOnSystemUiVisibilityChangeListener {
+            scheduleFullScreenMode()
+        }
+        enableFullScreenMode()
+
         clearWebSessionData()
         migrateServerUrlIfNeeded()
 
@@ -51,6 +59,57 @@ class MainActivity : Activity() {
             showServerSetup()
         } else {
             showWebView(serverUrl)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        enableFullScreenMode()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+
+        if (hasFocus) {
+            enableFullScreenMode()
+        }
+    }
+
+    private fun enableFullScreenMode() {
+        try {
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            actionBar?.hide()
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.setDecorFitsSystemWindows(false)
+                window.insetsController?.let { controller ->
+                    controller.hide(
+                        WindowInsets.Type.statusBars() or
+                            WindowInsets.Type.navigationBars()
+                    )
+                    controller.systemBarsBehavior =
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            } else {
+                window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_FULLSCREEN
+                    )
+            }
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun scheduleFullScreenMode() {
+        try {
+            window.decorView.postDelayed({
+                enableFullScreenMode()
+            }, 250)
+        } catch (_: Exception) {
         }
     }
 
@@ -105,6 +164,7 @@ class MainActivity : Activity() {
     private fun showServerSetup() {
 
         root.removeAllViews()
+        enableFullScreenMode()
 
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -178,6 +238,7 @@ class MainActivity : Activity() {
                         else
                             Color.RED
                     )
+                    scheduleFullScreenMode()
                 }
             }
         }
@@ -200,6 +261,7 @@ class MainActivity : Activity() {
         layout.addView(saveBtn)
 
         root.addView(layout)
+        scheduleFullScreenMode()
     }
 
     private fun testConnection(
@@ -238,6 +300,7 @@ class MainActivity : Activity() {
     private fun showWebView(url: String) {
 
         root.removeAllViews()
+        enableFullScreenMode()
 
         webView = WebView(this)
 
@@ -247,6 +310,10 @@ class MainActivity : Activity() {
         webView.settings.domStorageEnabled = true
         webView.settings.mixedContentMode =
             WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+        webView.setOnSystemUiVisibilityChangeListener {
+            scheduleFullScreenMode()
+        }
 
         webView.addJavascriptInterface(HtdiMesBridge(), "Android")
         webView.addJavascriptInterface(HtdiMesBridge(), "htdiApp")
@@ -263,11 +330,17 @@ class MainActivity : Activity() {
 
                 handler?.proceed()
             }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                scheduleFullScreenMode()
+            }
         }
 
         root.addView(webView)
 
         webView.loadUrl(buildLoginUrl(url))
+        scheduleFullScreenMode()
     }
 
     private inner class HtdiMesBridge {
