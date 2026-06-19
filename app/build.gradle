@@ -9,8 +9,8 @@ android {
         applicationId "kr.co.htdi.mes"
         minSdk 26
         targetSdk 35
-        versionCode 78
-        versionName "v78-exitbridge-http4443"
+        versionCode 79
+        versionName "v79-clean-login-start"
     }
 
     compileOptions {
