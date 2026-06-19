@@ -33,7 +33,7 @@ class MainActivity : Activity() {
         get() = prefs.getString("server_url", "") ?: ""
         set(value) = prefs.edit().putString(
             "server_url",
-            value.trim().removeSuffix("/")
+            normalizeUrl(value)
         ).apply()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +44,7 @@ class MainActivity : Activity() {
         root = FrameLayout(this)
         setContentView(root)
 
+        clearWebSessionData()
         migrateServerUrlIfNeeded()
 
         if (serverUrl.isBlank()) {
@@ -63,19 +64,41 @@ class MainActivity : Activity() {
             saved == "https://192.168.0.50:4443"
         ) {
             serverUrl = DEFAULT_SERVER_URL
+        } else {
+            serverUrl = normalizeUrl(saved)
         }
     }
 
     private fun normalizeUrl(raw: String): String {
-        val value = raw.trim().removeSuffix("/")
-
-        return if (
-            value.startsWith("http://") ||
-            value.startsWith("https://")
+        val trimmed = raw.trim().removeSuffix("/")
+        val withScheme = if (
+            trimmed.startsWith("http://") ||
+            trimmed.startsWith("https://")
         ) {
-            value
+            trimmed
         } else {
-            "http://$value"
+            "http://$trimmed"
+        }
+
+        return try {
+            val parsed = URL(withScheme)
+            val port = if (parsed.port > 0) ":${parsed.port}" else ""
+            "${parsed.protocol}://${parsed.host}$port"
+        } catch (_: Exception) {
+            withScheme
+        }
+    }
+
+    private fun buildLoginUrl(baseUrl: String): String {
+        return "${normalizeUrl(baseUrl)}/login.html?androidApp=1&forceLogin=1&t=${System.currentTimeMillis()}"
+    }
+
+    private fun clearWebSessionData() {
+        try {
+            CookieManager.getInstance().removeAllCookies(null)
+            CookieManager.getInstance().flush()
+            WebStorage.getInstance().deleteAllData()
+        } catch (_: Exception) {
         }
     }
 
@@ -188,7 +211,7 @@ class MainActivity : Activity() {
 
             try {
 
-                val conn = URL(url).openConnection() as HttpURLConnection
+                val conn = URL(buildLoginUrl(url)).openConnection() as HttpURLConnection
 
                 conn.connectTimeout = 4000
                 conn.readTimeout = 4000
@@ -218,6 +241,8 @@ class MainActivity : Activity() {
 
         webView = WebView(this)
 
+        webView.clearHistory()
+        webView.clearCache(true)
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
         webView.settings.mixedContentMode =
@@ -242,7 +267,7 @@ class MainActivity : Activity() {
 
         root.addView(webView)
 
-        webView.loadUrl(url)
+        webView.loadUrl(buildLoginUrl(url))
     }
 
     private inner class HtdiMesBridge {
@@ -269,9 +294,7 @@ class MainActivity : Activity() {
                 webView.loadUrl("about:blank")
             }
 
-            CookieManager.getInstance().removeAllCookies(null)
-            CookieManager.getInstance().flush()
-            WebStorage.getInstance().deleteAllData()
+            clearWebSessionData()
         } catch (_: Exception) {
         }
 
