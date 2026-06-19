@@ -9,8 +9,8 @@ android {
         applicationId "kr.co.htdi.mes"
         minSdk 26
         targetSdk 35
-        versionCode 79
-        versionName "v79-clean-login-start"
+        versionCode 80
+        versionName "v80-immersive-fullscreen"
     }
 
     compileOptions {
