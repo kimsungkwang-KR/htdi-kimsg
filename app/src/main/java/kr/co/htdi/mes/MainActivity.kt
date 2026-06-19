@@ -204,6 +204,9 @@ class MainActivity : Activity() {
         webView.settings.mixedContentMode =
             WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
+        webView.addJavascriptInterface(HtdiMesBridge(), "Android")
+        webView.addJavascriptInterface(HtdiMesBridge(), "htdiApp")
+
         webView.webChromeClient = WebChromeClient()
 
         webView.webViewClient = object : WebViewClient() {
@@ -221,6 +224,43 @@ class MainActivity : Activity() {
         root.addView(webView)
 
         webView.loadUrl(url)
+    }
+
+    private inner class HtdiMesBridge {
+
+        @JavascriptInterface
+        fun exitApp() {
+            runOnUiThread {
+                cleanupWebViewAndExit()
+            }
+        }
+
+        @JavascriptInterface
+        fun exit() {
+            exitApp()
+        }
+    }
+
+    private fun cleanupWebViewAndExit() {
+        try {
+            if (::webView.isInitialized) {
+                webView.stopLoading()
+                webView.clearHistory()
+                webView.clearCache(true)
+                webView.loadUrl("about:blank")
+            }
+
+            CookieManager.getInstance().removeAllCookies(null)
+            CookieManager.getInstance().flush()
+            WebStorage.getInstance().deleteAllData()
+        } catch (_: Exception) {
+        }
+
+        try {
+            finishAndRemoveTask()
+        } catch (_: Exception) {
+            finish()
+        }
     }
 
     override fun onBackPressed() {
