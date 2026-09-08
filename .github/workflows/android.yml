@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -32,6 +35,11 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+
+      - name: Set up Gradle for Android Gradle Plugin 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Build APK
         run: gradle --no-daemon --no-build-cache clean :app:assembleDebug -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true -Dorg.gradle.java.home=$JAVA_HOME -Dkotlin.jvm.target.validation.mode=warning

@@ -52,7 +52,7 @@ class MainActivity : Activity() {
         }
         enableFullScreenMode()
 
-        clearWebSessionData()
+        clearWebCookies()
         migrateServerUrlIfNeeded()
 
         if (serverUrl.isBlank()) {
@@ -152,11 +152,14 @@ class MainActivity : Activity() {
         return "${normalizeUrl(baseUrl)}/login.html?androidApp=1&forceLogin=1&t=${System.currentTimeMillis()}"
     }
 
-    private fun clearWebSessionData() {
+    private fun clearWebCookies() {
         try {
             CookieManager.getInstance().removeAllCookies(null)
             CookieManager.getInstance().flush()
-            WebStorage.getInstance().deleteAllData()
+            // Keep the user's saved ID across app starts and exits. The MES
+            // login page's androidApp=1&forceLogin=1 startup path removes login
+            // credentials while preserving only the explicit ID preference.
+            // WebStorage.deleteAllData() also erases that preference.
         } catch (_: Exception) {
         }
     }
@@ -367,7 +370,7 @@ class MainActivity : Activity() {
                 webView.loadUrl("about:blank")
             }
 
-            clearWebSessionData()
+            clearWebCookies()
         } catch (_: Exception) {
         }
 
